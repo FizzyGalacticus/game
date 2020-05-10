@@ -21,10 +21,7 @@ class MainScene extends Phaser.Scene {
         this.load.image('ground', ground);
         this.load.image('star', star);
         this.load.image('bomb', bomb);
-        this.load.spritesheet('dude', 
-            dude,
-            { frameWidth: 32, frameHeight: 48 }
-        );
+        this.load.spritesheet('dude', dude, { frameWidth: 32, frameHeight: 48 });
     }
 
     create() {
@@ -49,20 +46,20 @@ class MainScene extends Phaser.Scene {
             key: 'left',
             frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
             frameRate: 10,
-            repeat: -1
+            repeat: -1,
         });
 
         this.anims.create({
             key: 'turn',
-            frames: [ { key: 'dude', frame: 4 } ],
-            frameRate: 20
+            frames: [{ key: 'dude', frame: 4 }],
+            frameRate: 20,
         });
 
         this.anims.create({
             key: 'right',
             frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
             frameRate: 10,
-            repeat: -1
+            repeat: -1,
         });
 
         this.physics.add.collider(player, platforms);
@@ -70,15 +67,13 @@ class MainScene extends Phaser.Scene {
         const stars = this.physics.add.group({
             key: 'star',
             repeat: 11,
-            setXY: { x: 12, y: 0, stepX: 70 }
+            setXY: { x: 12, y: 0, stepX: 70 },
         });
 
         this.stars = stars;
-        
+
         stars.children.iterate(function (child) {
-        
             child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-        
         });
 
         this.physics.add.collider(stars, platforms);
@@ -100,27 +95,21 @@ class MainScene extends Phaser.Scene {
         const cursors = this.input.keyboard.createCursorKeys();
         const player = this.player;
 
-        if (cursors.left.isDown)
-        {
+        if (cursors.left.isDown) {
             player.setVelocityX(-160);
 
             player.anims.play('left', true);
-        }
-        else if (cursors.right.isDown)
-        {
+        } else if (cursors.right.isDown) {
             player.setVelocityX(160);
 
             player.anims.play('right', true);
-        }
-        else
-        {
+        } else {
             player.setVelocityX(0);
 
             player.anims.play('turn');
         }
 
-        if (cursors.up.isDown && player.body.touching.down)
-        {
+        if (cursors.up.isDown && player.body.touching.down) {
             player.setVelocityY(-330);
         }
     }
@@ -131,28 +120,26 @@ class MainScene extends Phaser.Scene {
         this.score += 10;
         this.scoreText.setText('Score: ' + this.score);
 
-        if (this.stars.countActive(true) === 0)
-        {
-            this.stars.children.iterate((child) => {
+        if (this.stars.countActive(true) === 0) {
+            this.stars.children.iterate(child => {
                 child.enableBody(true, child.x, 0, true, true);
             });
 
-            const x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
+            const x = player.x < 400 ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
 
             const bomb = this.bombs.create(x, 16, 'bomb');
             bomb.setBounce(1);
             bomb.setCollideWorldBounds(true);
             bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-
         }
     }
 
-    hitBomb(player, bomb) {
+    hitBomb(player /* , bomb */) {
         this.physics.pause();
 
-        this.player.setTint(0xff0000);
+        player.setTint(0xff0000);
 
-        this.player.anims.play('turn');
+        player.anims.play('turn');
 
         this.gameOver = true;
     }
