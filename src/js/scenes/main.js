@@ -10,7 +10,7 @@ import dude from '../../assets/dude.png';
 
 class MainScene extends Phaser.Scene {
     constructor() {
-        super();
+        super('game');
 
         this.collectStar = this.collectStar.bind(this);
         this.hitBomb = this.hitBomb.bind(this);

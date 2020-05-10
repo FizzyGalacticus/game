@@ -2,13 +2,13 @@
 
 import Phaser from 'phaser';
 
+import config from './config';
+
 import mainScene from './scenes/main.js';
 
-const config = {
+const gameConfig = {
     type: Phaser.AUTO,
-    parent: 'game',
-    width: 800,
-    height: 600,
+    ...config.game,
     physics: {
         default: 'arcade',
         arcade: {
@@ -19,4 +19,4 @@ const config = {
 };
 
 // eslint-disable-next-line no-unused-vars
-const game = new Phaser.Game(config);
+const game = new Phaser.Game(gameConfig);
