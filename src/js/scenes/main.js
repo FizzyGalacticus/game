@@ -2,7 +2,8 @@
 
 import Phaser from 'phaser';
 
-import sky from '../../assets/sky.png';
+import Sky from '../entities/Sky';
+
 import ground from '../../assets/platform.png';
 import star from '../../assets/star.png';
 import bomb from '../../assets/bomb.png';
@@ -12,12 +13,14 @@ class MainScene extends Phaser.Scene {
     constructor() {
         super('game');
 
+        this.entities = [new Sky(this)];
+
         this.collectStar = this.collectStar.bind(this);
         this.hitBomb = this.hitBomb.bind(this);
     }
 
     preload() {
-        this.load.image('sky', sky);
+        this.entities.forEach(entity => entity.preload());
         this.load.image('ground', ground);
         this.load.image('star', star);
         this.load.image('bomb', bomb);
@@ -25,8 +28,8 @@ class MainScene extends Phaser.Scene {
     }
 
     create() {
+        this.entities.forEach(entity => entity.create());
         this.gameOver = false;
-        this.add.image(400, 300, 'sky');
 
         const platforms = this.physics.add.staticGroup();
 
@@ -88,10 +91,11 @@ class MainScene extends Phaser.Scene {
         this.physics.add.collider(player, bombs, this.hitBomb, null, this);
 
         this.score = 0;
-        this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
+        this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#FFF' });
     }
 
     update() {
+        this.entities.forEach(entity => entity.update());
         const cursors = this.input.keyboard.createCursorKeys();
         const player = this.player;
 
