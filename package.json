@@ -1,0 +1,23 @@
+{
+  "name": "game",
+  "version": "1.0.0",
+  "description": "A Phaser playground",
+  "main": "index.js",
+  "author": "Dustin L. Dodson <dustinleedodson@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "mkdir -p dist/ && cp -r src/assets dist/ && parcel src/index.html"
+  },
+  "alias": {
+    "assets": "src/assets"
+  },
+  "dependencies": {
+    "assets": "^3.0.1",
+    "phaser": "^3.23.0",
+    "src": "^1.1.2"
+  },
+  "devDependencies": {
+    "parcel": "^1.12.4",
+    "parcel-bundler": "^1.12.4"
+  }
+}
