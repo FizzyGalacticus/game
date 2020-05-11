@@ -2,6 +2,8 @@
 
 import Phaser from 'phaser';
 
+import Game from './Game';
+
 import config from './config';
 
 import mainScene from './scenes/main.js';
@@ -19,4 +21,4 @@ const gameConfig = {
 };
 
 // eslint-disable-next-line no-unused-vars
-const game = new Phaser.Game(gameConfig);
+const game = new Game(gameConfig);

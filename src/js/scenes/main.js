@@ -85,8 +85,8 @@ class MainScene extends Phaser.Scene {
         this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#FFF' });
     }
 
-    update() {
-        this.entities.forEach(entity => entity.update());
+    update(time, delta) {
+        this.entities.forEach(entity => entity.update(time, delta));
     }
 }
 
