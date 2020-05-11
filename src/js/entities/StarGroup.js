@@ -1,5 +1,7 @@
 'use strict';
 
+import Phaser from 'phaser';
+
 import BaseCollidableEntity from './BaseCollidable';
 
 import star from '../../assets/star.png';
@@ -23,6 +25,8 @@ class StarGroupEntity extends BaseCollidableEntity {
 
         this.positions.forEach(([x, y, cb = noop]) => {
             const obj = this.phaserEntity.create(x, y, 'star');
+
+            obj.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
 
             cb(obj);
         });

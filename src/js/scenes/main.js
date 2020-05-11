@@ -5,13 +5,15 @@ import Phaser from 'phaser';
 import Sky from '../entities/Sky';
 import PlatformGroup from '../entities/PlatformGroup';
 import StarGroup from '../entities/StarGroup';
+import Dude from '../entities/Dude';
 
 import bomb from '../../assets/bomb.png';
-import dude from '../../assets/dude.png';
 
 class MainScene extends Phaser.Scene {
     constructor() {
         super('game');
+
+        this.gameOver = false;
 
         this.sky = new Sky(this);
 
@@ -24,7 +26,7 @@ class MainScene extends Phaser.Scene {
 
         this.stars = [];
 
-        for (let i = 0; i < 11; i++) {
+        for (let i = 0; i < 1; i++) {
             this.stars.push(i * 70 + 12);
         }
 
@@ -33,64 +35,41 @@ class MainScene extends Phaser.Scene {
             this.stars.map(x => [x, 0])
         );
 
-        this.entities = [this.sky, this.platforms, this.stars];
+        this.player = new Dude(this, 100, 50);
+
+        this.entities = [this.sky, this.platforms, this.stars, this.player];
 
         this.collectStar = this.collectStar.bind(this);
-        this.hitBomb = this.hitBomb.bind(this);
     }
 
     preload() {
         this.entities.forEach(entity => entity.preload());
         this.load.image('bomb', bomb);
-        this.load.spritesheet('dude', dude, { frameWidth: 32, frameHeight: 48 });
     }
 
     create() {
         this.entities.forEach(entity => entity.create());
-        this.gameOver = false;
 
-        this.player = this.physics.add.sprite(100, 450, 'dude');
-        const player = this.player;
-
-        player.setBounce(0.2);
-        player.setCollideWorldBounds(true);
-
-        this.anims.create({
-            key: 'left',
-            frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
-            frameRate: 10,
-            repeat: -1,
-        });
-
-        this.anims.create({
-            key: 'turn',
-            frames: [{ key: 'dude', frame: 4 }],
-            frameRate: 20,
-        });
-
-        this.anims.create({
-            key: 'right',
-            frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
-            frameRate: 10,
-            repeat: -1,
-        });
-
-        this.platforms.addCollider({ phaserEntity: player });
-
-        this.stars.phaserEntity.children.iterate(child => {
-            child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-        });
+        this.platforms.addCollider(this.player);
 
         this.platforms.addCollider(this.stars);
 
-        this.stars.addCollider({ phaserEntity: player }, this.collectStar);
+        this.stars.addCollider(this.player, this.collectStar);
 
         const bombs = this.physics.add.group();
         this.bombs = bombs;
 
         this.platforms.addCollider({ phaserEntity: bombs });
 
-        this.physics.add.collider(player, bombs, this.hitBomb, null, this);
+        this.player.addCollider({ phaserEntity: bombs }, () => {
+            this.physics.pause();
+
+            this.player.phaserEntity.setTint(0xff0000);
+
+            this.player.phaserEntity.anims.play('turn');
+
+            this.gameOver = true;
+        });
 
         this.score = 0;
         this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#FFF' });
@@ -98,26 +77,6 @@ class MainScene extends Phaser.Scene {
 
     update() {
         this.entities.forEach(entity => entity.update());
-        const cursors = this.input.keyboard.createCursorKeys();
-        const player = this.player;
-
-        if (cursors.left.isDown) {
-            player.setVelocityX(-160);
-
-            player.anims.play('left', true);
-        } else if (cursors.right.isDown) {
-            player.setVelocityX(160);
-
-            player.anims.play('right', true);
-        } else {
-            player.setVelocityX(0);
-
-            player.anims.play('turn');
-        }
-
-        if (cursors.up.isDown && player.body.touching.down) {
-            player.setVelocityY(-330);
-        }
     }
 
     collectStar(player, star) {
@@ -138,16 +97,6 @@ class MainScene extends Phaser.Scene {
             bomb.setCollideWorldBounds(true);
             bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
         }
-    }
-
-    hitBomb(player /* , bomb */) {
-        this.physics.pause();
-
-        player.setTint(0xff0000);
-
-        player.anims.play('turn');
-
-        this.gameOver = true;
     }
 }
 
