@@ -4,8 +4,8 @@ import Phaser from 'phaser';
 
 import Sky from '../entities/Sky';
 import PlatformGroup from '../entities/PlatformGroup';
+import StarGroup from '../entities/StarGroup';
 
-import star from '../../assets/star.png';
 import bomb from '../../assets/bomb.png';
 import dude from '../../assets/dude.png';
 
@@ -22,7 +22,18 @@ class MainScene extends Phaser.Scene {
             [750, 220],
         ]);
 
-        this.entities = [this.sky, this.platforms];
+        this.stars = [];
+
+        for (let i = 0; i < 11; i++) {
+            this.stars.push(i * 70 + 12);
+        }
+
+        this.stars = new StarGroup(
+            this,
+            this.stars.map(x => [x, 0])
+        );
+
+        this.entities = [this.sky, this.platforms, this.stars];
 
         this.collectStar = this.collectStar.bind(this);
         this.hitBomb = this.hitBomb.bind(this);
@@ -30,7 +41,6 @@ class MainScene extends Phaser.Scene {
 
     preload() {
         this.entities.forEach(entity => entity.preload());
-        this.load.image('star', star);
         this.load.image('bomb', bomb);
         this.load.spritesheet('dude', dude, { frameWidth: 32, frameHeight: 48 });
     }
@@ -67,21 +77,13 @@ class MainScene extends Phaser.Scene {
 
         this.platforms.addCollider({ phaserEntity: player });
 
-        const stars = this.physics.add.group({
-            key: 'star',
-            repeat: 11,
-            setXY: { x: 12, y: 0, stepX: 70 },
-        });
-
-        this.stars = stars;
-
-        stars.children.iterate(function (child) {
+        this.stars.phaserEntity.children.iterate(child => {
             child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
         });
 
-        this.platforms.addCollider({ phaserEntity: stars });
+        this.platforms.addCollider(this.stars);
 
-        this.physics.add.overlap(player, stars, this.collectStar, null, this);
+        this.stars.addCollider({ phaserEntity: player }, this.collectStar);
 
         const bombs = this.physics.add.group();
         this.bombs = bombs;
@@ -124,8 +126,8 @@ class MainScene extends Phaser.Scene {
         this.score += 10;
         this.scoreText.setText('Score: ' + this.score);
 
-        if (this.stars.countActive(true) === 0) {
-            this.stars.children.iterate(child => {
+        if (this.stars.phaserEntity.countActive(true) === 0) {
+            this.stars.phaserEntity.children.iterate(child => {
                 child.enableBody(true, child.x, 0, true, true);
             });
 
