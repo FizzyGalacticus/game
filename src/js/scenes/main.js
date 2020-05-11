@@ -10,9 +10,7 @@ import BombFactory from '../entities/BombFactory';
 
 class MainScene extends Phaser.Scene {
     constructor() {
-        super('game');
-
-        this.gameOver = false;
+        super('main');
 
         this.sky = new Sky(this);
 
@@ -78,7 +76,7 @@ class MainScene extends Phaser.Scene {
 
             this.player.phaserEntity.anims.play('turn');
 
-            this.gameOver = true;
+            this.game.gameOver();
         });
 
         this.score = 0;

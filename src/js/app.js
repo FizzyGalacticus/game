@@ -6,7 +6,7 @@ import Game from './Game';
 
 import config from './config';
 
-import mainScene from './scenes/main.js';
+import scenes from './scenes';
 
 const gameConfig = {
     type: Phaser.AUTO,
@@ -17,7 +17,7 @@ const gameConfig = {
             gravity: { y: 300 },
         },
     },
-    scene: mainScene,
+    scene: scenes,
 };
 
 // eslint-disable-next-line no-unused-vars
