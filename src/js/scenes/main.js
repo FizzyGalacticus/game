@@ -6,8 +6,7 @@ import Sky from '../entities/Sky';
 import PlatformGroup from '../entities/PlatformGroup';
 import StarGroup from '../entities/StarGroup';
 import Dude from '../entities/Dude';
-
-import bomb from '../../assets/bomb.png';
+import BombFactory from '../entities/BombFactory';
 
 class MainScene extends Phaser.Scene {
     constructor() {
@@ -26,7 +25,7 @@ class MainScene extends Phaser.Scene {
 
         this.stars = [];
 
-        for (let i = 0; i < 1; i++) {
+        for (let i = 0; i < 12; i++) {
             this.stars.push(i * 70 + 12);
         }
 
@@ -35,16 +34,15 @@ class MainScene extends Phaser.Scene {
             this.stars.map(x => [x, 0])
         );
 
-        this.player = new Dude(this, 100, 50);
+        this.player = new Dude(this, 100, 450);
 
-        this.entities = [this.sky, this.platforms, this.stars, this.player];
+        this.bombs = new BombFactory(this, [[350, 16]]);
 
-        this.collectStar = this.collectStar.bind(this);
+        this.entities = [this.sky, this.platforms, this.stars, this.player, this.bombs];
     }
 
     preload() {
         this.entities.forEach(entity => entity.preload());
-        this.load.image('bomb', bomb);
     }
 
     create() {
@@ -54,14 +52,26 @@ class MainScene extends Phaser.Scene {
 
         this.platforms.addCollider(this.stars);
 
-        this.stars.addCollider(this.player, this.collectStar);
+        this.stars.addCollider(this.player, (player, star) => {
+            star.disableBody(true, true);
 
-        const bombs = this.physics.add.group();
-        this.bombs = bombs;
+            this.score += 10;
+            this.scoreText.setText('Score: ' + this.score);
 
-        this.platforms.addCollider({ phaserEntity: bombs });
+            if (this.stars.isEmpty()) {
+                this.stars.forEach(child => {
+                    child.enableBody(true, child.x, 0, true, true);
+                });
 
-        this.player.addCollider({ phaserEntity: bombs }, () => {
+                const x = player.x < 400 ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
+
+                this.bombs.createBomb(x, 16);
+            }
+        });
+
+        this.platforms.addCollider(this.bombs);
+
+        this.player.addCollider(this.bombs, () => {
             this.physics.pause();
 
             this.player.phaserEntity.setTint(0xff0000);
@@ -77,26 +87,6 @@ class MainScene extends Phaser.Scene {
 
     update() {
         this.entities.forEach(entity => entity.update());
-    }
-
-    collectStar(player, star) {
-        star.disableBody(true, true);
-
-        this.score += 10;
-        this.scoreText.setText('Score: ' + this.score);
-
-        if (this.stars.phaserEntity.countActive(true) === 0) {
-            this.stars.phaserEntity.children.iterate(child => {
-                child.enableBody(true, child.x, 0, true, true);
-            });
-
-            const x = player.x < 400 ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
-
-            const bomb = this.bombs.create(x, 16, 'bomb');
-            bomb.setBounce(1);
-            bomb.setCollideWorldBounds(true);
-            bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-        }
     }
 }
 

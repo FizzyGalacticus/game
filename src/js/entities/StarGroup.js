@@ -6,7 +6,6 @@ import BaseCollidableEntity from './BaseCollidable';
 
 import star from '../../assets/star.png';
 
-import logger from '../util/logger';
 import { noop } from '../util/function';
 
 class StarGroupEntity extends BaseCollidableEntity {
@@ -14,6 +13,9 @@ class StarGroupEntity extends BaseCollidableEntity {
         super('star', scene);
 
         this.positions = positions;
+
+        this.isEmpty = this.isEmpty.bind(this);
+        this.forEach = this.forEach.bind(this);
     }
 
     preload() {
@@ -32,8 +34,12 @@ class StarGroupEntity extends BaseCollidableEntity {
         });
     }
 
-    update() {
-        logger.warn(`Method 'update' not implemented in ${this.name}`);
+    isEmpty() {
+        return this.phaserEntity.countActive(true) === 0;
+    }
+
+    forEach(fn = noop) {
+        this.phaserEntity.children.iterate(fn);
     }
 }
 
