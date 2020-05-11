@@ -3,8 +3,8 @@
 import Phaser from 'phaser';
 
 import Sky from '../entities/Sky';
+import PlatformGroup from '../entities/PlatformGroup';
 
-import ground from '../../assets/platform.png';
 import star from '../../assets/star.png';
 import bomb from '../../assets/bomb.png';
 import dude from '../../assets/dude.png';
@@ -13,7 +13,16 @@ class MainScene extends Phaser.Scene {
     constructor() {
         super('game');
 
-        this.entities = [new Sky(this)];
+        this.sky = new Sky(this);
+
+        this.platforms = new PlatformGroup(this, [
+            [400, 568, platform => platform.setScale(2).refreshBody()],
+            [600, 400],
+            [50, 250],
+            [750, 220],
+        ]);
+
+        this.entities = [this.sky, this.platforms];
 
         this.collectStar = this.collectStar.bind(this);
         this.hitBomb = this.hitBomb.bind(this);
@@ -21,7 +30,6 @@ class MainScene extends Phaser.Scene {
 
     preload() {
         this.entities.forEach(entity => entity.preload());
-        this.load.image('ground', ground);
         this.load.image('star', star);
         this.load.image('bomb', bomb);
         this.load.spritesheet('dude', dude, { frameWidth: 32, frameHeight: 48 });
@@ -30,14 +38,6 @@ class MainScene extends Phaser.Scene {
     create() {
         this.entities.forEach(entity => entity.create());
         this.gameOver = false;
-
-        const platforms = this.physics.add.staticGroup();
-
-        platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-
-        platforms.create(600, 400, 'ground');
-        platforms.create(50, 250, 'ground');
-        platforms.create(750, 220, 'ground');
 
         this.player = this.physics.add.sprite(100, 450, 'dude');
         const player = this.player;
@@ -65,7 +65,7 @@ class MainScene extends Phaser.Scene {
             repeat: -1,
         });
 
-        this.physics.add.collider(player, platforms);
+        this.platforms.addCollider({ phaserEntity: player });
 
         const stars = this.physics.add.group({
             key: 'star',
@@ -79,14 +79,14 @@ class MainScene extends Phaser.Scene {
             child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
         });
 
-        this.physics.add.collider(stars, platforms);
+        this.platforms.addCollider({ phaserEntity: stars });
 
         this.physics.add.overlap(player, stars, this.collectStar, null, this);
 
         const bombs = this.physics.add.group();
         this.bombs = bombs;
 
-        this.physics.add.collider(bombs, platforms);
+        this.platforms.addCollider({ phaserEntity: bombs });
 
         this.physics.add.collider(player, bombs, this.hitBomb, null, this);
 

@@ -11,17 +11,11 @@ class BaseEntity {
         this.create = this.create.bind(this);
         this.update = this.update.bind(this);
 
+        this.phaserEntity;
+
         this.getGameConfig = this.getGameConfig.bind(this);
         this.getGameWidth = this.getGameWidth.bind(this);
         this.getGameHeight = this.getGameHeight.bind(this);
-    }
-
-    getScene() {
-        if (!this.scene) {
-            throw new Error(`${this.name} has to scene`);
-        }
-
-        return this.scene;
     }
 
     getGameConfig() {
