@@ -2,19 +2,19 @@
 
 import Phaser from 'phaser';
 
-import Sky from '../entities/Sky';
-import PlatformGroup from '../entities/PlatformGroup';
+import Background from '../entities/Background';
 import Dude from '../entities/Dude';
 import BombFactory from '../entities/BombFactory';
 import StarFactory from '../entities/StarFactory';
+import PlatformFactory from '../entities/PlatformFactory';
 
 class MainScene extends Phaser.Scene {
     constructor() {
         super('main');
 
-        this.sky = new Sky(this);
+        this.background = new Background(this, 'sky');
 
-        this.platforms = new PlatformGroup(this, [
+        this.platforms = new PlatformFactory(this, [
             [400, 568, platform => platform.setScale(2).refreshBody()],
             [600, 400],
             [50, 250],
@@ -26,7 +26,7 @@ class MainScene extends Phaser.Scene {
         this.bombs = new BombFactory(this);
         this.stars = new StarFactory(this);
 
-        this.entities = [this.sky, this.platforms, this.stars, this.player, this.bombs];
+        this.entities = [this.background, this.platforms, this.stars, this.player, this.bombs];
 
         this.totalDelta = 0;
 

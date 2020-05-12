@@ -4,20 +4,22 @@ import BaseCollidableEntity from './BaseCollidable';
 
 import { noop } from '../util/function';
 
-import bomb from '../../assets/bomb.png';
-import star from '../../assets/star.png';
-
-const collidables = { bomb, star };
+import { collidable } from '../util/asset';
 
 class CollidableFactory extends BaseCollidableEntity {
-    constructor(asset, scene, positions = []) {
+    constructor({ asset, groupType = 'group', scene, positions = [] } = {}) {
         super(asset, scene);
 
-        if (!asset in collidables) {
+        if (!asset in collidable) {
             throw new Error(`'${asset}' not a valid collidable`);
         }
 
+        if (!['group', 'staticGroup'].includes(groupType)) {
+            throw new Error(`'${groupType}' not a valid group type`);
+        }
+
         this.asset = asset;
+        this.groupType = groupType;
 
         this.positions = positions;
 
@@ -32,17 +34,16 @@ class CollidableFactory extends BaseCollidableEntity {
 
     preload() {
         if (!CollidableFactory.loaded) {
-            this.scene.load.image('bomb', bomb);
-            this.scene.load.image('star', star);
+            Object.entries(collidable).forEach(([key, src]) => this.scene.load.image(key, src));
 
             CollidableFactory.loaded = true;
         }
     }
 
     create() {
-        this.phaserEntity = this.scene.physics.add.group();
+        this.phaserEntity = this.scene.physics.add[this.groupType]();
 
-        this.positions.forEach(([x, y]) => this.new(x, y));
+        this.positions.forEach(([x, y, cb]) => this.new(x, y, cb));
     }
 
     count() {

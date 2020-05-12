@@ -2,7 +2,9 @@
 
 import BaseCollidableEntity from './BaseCollidable';
 
-import dude from '../../assets/dude.png';
+import { players } from '../util/asset';
+
+const { dude } = players;
 
 class DudeEntity extends BaseCollidableEntity {
     constructor(scene, x, y) {

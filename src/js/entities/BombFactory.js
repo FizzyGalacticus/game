@@ -6,7 +6,7 @@ import CollidableFactory from './CollidableFactory';
 
 class BombFactory extends CollidableFactory {
     constructor(scene, positions = []) {
-        super('bomb', scene, positions);
+        super({ asset: 'bomb', scene, positions });
     }
 
     onCreate(bomb) {

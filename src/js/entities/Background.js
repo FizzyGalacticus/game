@@ -4,24 +4,26 @@ import Phaser from 'phaser';
 
 import BaseEntity from './Base';
 
-import sky from '../../assets/sky.png';
+import { background } from '../util/asset';
 
 import logger from '../util/logger';
 
-class SkyEntity extends BaseEntity {
-    constructor(scene) {
-        super('Sky', scene);
+class BackgroundEntity extends BaseEntity {
+    constructor(scene, asset) {
+        super(asset, scene);
+
+        this.asset = asset;
     }
 
     preload() {
-        this.scene.load.image('sky', sky);
+        this.scene.load.image(this.asset, background[this.asset]);
     }
 
     create() {
         const x = Phaser.Math.FloorTo(this.getGameWidth() / 2);
         const y = Phaser.Math.FloorTo(this.getGameHeight() / 2);
 
-        this.scene.add.image(x, y, 'sky');
+        this.scene.add.image(x, y, this.asset);
     }
 
     update() {
@@ -29,4 +31,4 @@ class SkyEntity extends BaseEntity {
     }
 }
 
-export default SkyEntity;
+export default BackgroundEntity;

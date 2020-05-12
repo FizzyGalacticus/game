@@ -6,7 +6,7 @@ import CollidableFactory from './CollidableFactory';
 
 class StarFactory extends CollidableFactory {
     constructor(scene, positions = []) {
-        super({ asset: 'star', scene, positions });
+        super({ asset: 'platform', groupType: 'staticGroup', scene, positions });
     }
 
     onCreate(star) {
