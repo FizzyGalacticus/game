@@ -16,6 +16,7 @@ class BaseEntity {
         this.getGameConfig = this.getGameConfig.bind(this);
         this.getGameWidth = this.getGameWidth.bind(this);
         this.getGameHeight = this.getGameHeight.bind(this);
+        this.entity = this.entity.bind(this);
     }
 
     getGameConfig() {
@@ -28,6 +29,10 @@ class BaseEntity {
 
     getGameHeight() {
         return this.getGameConfig().height;
+    }
+
+    entity() {
+        return this.phaserEntity;
     }
 
     preload() {

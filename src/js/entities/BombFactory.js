@@ -2,36 +2,18 @@
 
 import Phaser from 'phaser';
 
-import BaseCollidableEntity from './BaseCollidable';
+import CollidableFactory from './CollidableFactory';
 
-import bomb from '../../assets/bomb.png';
-
-class BombGroupEntity extends BaseCollidableEntity {
+class BombFactory extends CollidableFactory {
     constructor(scene, positions = []) {
-        super('bomb', scene);
-
-        this.positions = positions;
-
-        this.createBomb = this.createBomb.bind(this);
+        super('bomb', scene, positions);
     }
 
-    preload() {
-        this.scene.load.image('bomb', bomb);
-    }
-
-    create() {
-        this.phaserEntity = this.scene.physics.add.group();
-
-        this.positions.forEach(([x, y]) => this.createBomb(x, y));
-    }
-
-    createBomb(x, y) {
-        const bomb = this.phaserEntity.create(x, y, 'bomb');
-
+    onCreate(bomb) {
         bomb.setBounce(1);
         bomb.setCollideWorldBounds(true);
         bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
     }
 }
 
-export default BombGroupEntity;
+export default BombFactory;

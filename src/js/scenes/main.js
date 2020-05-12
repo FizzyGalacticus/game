@@ -4,9 +4,9 @@ import Phaser from 'phaser';
 
 import Sky from '../entities/Sky';
 import PlatformGroup from '../entities/PlatformGroup';
-import StarGroup from '../entities/StarGroup';
 import Dude from '../entities/Dude';
 import BombFactory from '../entities/BombFactory';
+import StarFactory from '../entities/StarFactory';
 
 class MainScene extends Phaser.Scene {
     constructor() {
@@ -21,22 +21,16 @@ class MainScene extends Phaser.Scene {
             [750, 220],
         ]);
 
-        this.stars = [];
-
-        for (let i = 0; i < 12; i++) {
-            this.stars.push(i * 70 + 12);
-        }
-
-        this.stars = new StarGroup(
-            this,
-            this.stars.map(x => [x, 0])
-        );
-
         this.player = new Dude(this, 100, 450);
 
-        this.bombs = new BombFactory(this, [[350, 16]]);
+        this.bombs = new BombFactory(this);
+        this.stars = new StarFactory(this);
 
         this.entities = [this.sky, this.platforms, this.stars, this.player, this.bombs];
+
+        this.totalDelta = 0;
+
+        this.createStars = this.createStars.bind(this);
     }
 
     preload() {
@@ -51,19 +45,15 @@ class MainScene extends Phaser.Scene {
         this.platforms.addCollider(this.stars);
 
         this.stars.addCollider(this.player, (player, star) => {
-            star.disableBody(true, true);
+            star.destroy();
 
             this.score += 10;
             this.scoreText.setText('Score: ' + this.score);
 
             if (this.stars.isEmpty()) {
-                this.stars.forEach(child => {
-                    child.enableBody(true, child.x, 0, true, true);
-                });
-
                 const x = player.x < 400 ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
 
-                this.bombs.createBomb(x, 16);
+                this.bombs.new(x, 16);
             }
         });
 
@@ -72,9 +62,9 @@ class MainScene extends Phaser.Scene {
         this.player.addCollider(this.bombs, () => {
             this.physics.pause();
 
-            this.player.phaserEntity.setTint(0xff0000);
+            this.player.entity().setTint(0xff0000);
 
-            this.player.phaserEntity.anims.play('turn');
+            this.player.entity().anims.play('turn');
 
             this.game.gameOver();
         });
@@ -85,6 +75,24 @@ class MainScene extends Phaser.Scene {
 
     update(time, delta) {
         this.entities.forEach(entity => entity.update(time, delta));
+
+        this.totalDelta += delta;
+
+        if (this.totalDelta > 3000) {
+            this.totalDelta = 0;
+
+            if (this.stars.count() < 10) {
+                this.createStars();
+            }
+        }
+    }
+
+    createStars(num = 1) {
+        for (let i = 0; i < num; i++) {
+            const x = Phaser.Math.Between(0, this.game.config.width);
+
+            this.stars.new(x, 16);
+        }
     }
 }
 
